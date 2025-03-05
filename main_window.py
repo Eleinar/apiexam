@@ -3,7 +3,7 @@ from PySide6.QtWidgets import (QMainWindow, QTableWidget, QTableWidgetItem, QVBo
 import requests
 from cat_dialog import CatDialog
 
-def load_cats():
+def load_cats(): # Метод для получения котов
     url = "https://api.thecatapi.com/v1/breeds"
     response = requests.get(url)
     if response.status_code == 200:
@@ -18,24 +18,24 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Котики")
         self.setGeometry(100, 100, 800, 600)
 
-        self.cats = load_cats()
-        self.filtered_cats = self.cats.copy()
-
-        self.table = QTableWidget()
+        self.cats = load_cats() # Сохраняем котов в переменную
+        self.filtered_cats = self.cats.copy() # Копируем котов для фильтрации
+    
+        self.table = QTableWidget() # Создание таблицы
         self.table.setColumnCount(3)
         self.table.setHorizontalHeaderLabels(["Имя", "Происхождение", "Темперамент"])
-        self.table.doubleClicked.connect(self.open_cat_dialog)
+        self.table.doubleClicked.connect(self.open_cat_info)
 
-        self.filter_combo = QComboBox()
+        self.filter_combo = QComboBox() # Создание фильтра
         self.filter_combo.addItem("Все")
         self.origins = sorted({cat.get("origin", "") for cat in self.cats})
         self.filter_combo.addItems(self.origins)
         self.filter_combo.currentIndexChanged.connect(self.apply_filter)
 
-        self.delete_button = QPushButton("Удалить выбранного кота")
+        self.delete_button = QPushButton("Удалить выбранного кота") # Кнопка удаления
         self.delete_button.clicked.connect(self.delete_selected_cat)
 
-        filter_layout = QHBoxLayout()
+        filter_layout = QHBoxLayout() # Компоновка
         filter_layout.addWidget(QLabel("Фильтр по происхождению:"))
         filter_layout.addWidget(self.filter_combo)
         filter_layout.addWidget(self.delete_button)
@@ -50,14 +50,14 @@ class MainWindow(QMainWindow):
 
         self.update_table()
 
-    def update_table(self):
+    def update_table(self): # Метод заполнения таблицы
         self.table.setRowCount(len(self.filtered_cats))
         for row, cat in enumerate(self.filtered_cats):
             self.table.setItem(row, 0, QTableWidgetItem(cat.get("name", "")))
             self.table.setItem(row, 1, QTableWidgetItem(cat.get("origin", "")))
             self.table.setItem(row, 2, QTableWidgetItem(cat.get("temperament", "")))
 
-    def apply_filter(self):
+    def apply_filter(self): # Применение сортировки
         selected_origin = self.filter_combo.currentText()
         if selected_origin == "Все":
             self.filtered_cats = self.cats.copy()
@@ -65,17 +65,17 @@ class MainWindow(QMainWindow):
             self.filtered_cats = [cat for cat in self.cats if cat.get("origin") == selected_origin]
         self.update_table()
 
-    def open_cat_dialog(self):
+    def open_cat_info(self): # Открытие окна с информацией
         row = self.table.currentRow()
         if row < 0:
             return
         cat = self.filtered_cats[row]
-        dialog = CatDialog(cat, self)
+        dialog = CatDialog(self, cat)
         if dialog.exec():
             self.cats = [dialog.cat if c['id'] == cat['id'] else c for c in self.cats]
             self.apply_filter()
 
-    def delete_selected_cat(self):
+    def delete_selected_cat(self): # Удаление выбранного кота
         row = self.table.currentRow()
         if row < 0:
             QMessageBox.warning(self, "Ошибка", "Выберите кота для удаления.")

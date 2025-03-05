@@ -1,17 +1,17 @@
 from PySide6.QtWidgets import (QDialog, QVBoxLayout, QLabel, QLineEdit, QTextEdit, QPushButton, QHBoxLayout)
 
-class CatDialog(QDialog):
-    def __init__(self, cat, parent=None):
-        super().__init__(parent)
+class CatDialog(QDialog): # Диалоговое окно с информацией
+    def __init__(self, cat):
+        super().__init__()
         self.setWindowTitle(f"Информация о коте: {cat.get('name', '')}")
         self.cat = cat.copy()
 
         self.layout = QVBoxLayout()
 
-        self.name_edit = QLineEdit(self.cat.get("name", ""))
-        self.origin_edit = QLineEdit(self.cat.get("origin", ""))
-        self.temperament_edit = QTextEdit(self.cat.get("temperament", ""))
-
+        self.name_edit = QLineEdit(self.cat.get("name", "")) # Получение названия
+        self.origin_edit = QLineEdit(self.cat.get("origin", "")) # Получение происхождения
+        self.temperament_edit = QTextEdit(self.cat.get("temperament", "")) # Получение темперамента
+        # Запрет на редактирования (до нажатия кнопки)
         self.name_edit.setReadOnly(True)
         self.origin_edit.setReadOnly(True)
         self.temperament_edit.setReadOnly(True)
@@ -37,14 +37,14 @@ class CatDialog(QDialog):
         self.layout.addLayout(button_layout)
         self.setLayout(self.layout)
 
-    def toggle_edit(self):
+    def toggle_edit(self): # Разрешение редактирования
         editable = not self.name_edit.isReadOnly()
         self.name_edit.setReadOnly(editable)
         self.origin_edit.setReadOnly(editable)
         self.temperament_edit.setReadOnly(editable)
         self.save_button.setEnabled(not editable)
 
-    def save_changes(self):
+    def save_changes(self): # Сохранение изменений
         self.cat["name"] = self.name_edit.text()
         self.cat["origin"] = self.origin_edit.text()
         self.cat["temperament"] = self.temperament_edit.toPlainText()
