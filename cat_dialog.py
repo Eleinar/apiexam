@@ -38,8 +38,9 @@ class CatDialog(QDialog): # Диалоговое окно с информаци�
         self.setLayout(self.layout)
 
     def toggle_edit(self): # Разрешение редактирования
-        editable = not self.name_edit.isReadOnly()
-        self.name_edit.setReadOnly(editable)
+        editable = not self.name_edit.isReadOnly() # Флаг редактируем/не редактируем
+        # Смена доступа
+        self.name_edit.setReadOnly(editable) 
         self.origin_edit.setReadOnly(editable)
         self.temperament_edit.setReadOnly(editable)
         self.save_button.setEnabled(not editable)

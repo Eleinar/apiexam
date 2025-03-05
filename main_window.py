@@ -57,32 +57,32 @@ class MainWindow(QMainWindow):
             self.table.setItem(row, 1, QTableWidgetItem(cat.get("origin", "")))
             self.table.setItem(row, 2, QTableWidgetItem(cat.get("temperament", "")))
 
-    def apply_filter(self): # Применение сортировки
-        selected_origin = self.filter_combo.currentText()
-        if selected_origin == "Все":
-            self.filtered_cats = self.cats.copy()
+    def apply_filter(self): # Применение фильтрации
+        selected_origin = self.filter_combo.currentText() # Получаем выбранное происхождение
+        if selected_origin == "Все": # Если кот не выбран
+            self.filtered_cats = self.cats.copy() # Выводим всех
         else:
-            self.filtered_cats = [cat for cat in self.cats if cat.get("origin") == selected_origin]
-        self.update_table()
+            self.filtered_cats = [cat for cat in self.cats if cat.get("origin") == selected_origin] # Ищем котов с выбранным происхождением
+        self.update_table() # Обновляем таблицу
 
     def open_cat_info(self): # Открытие окна с информацией
         row = self.table.currentRow()
         if row < 0:
             return
         cat = self.filtered_cats[row]
-        dialog = CatDialog(self, cat)
+        dialog = CatDialog(cat)
         if dialog.exec():
             self.cats = [dialog.cat if c['id'] == cat['id'] else c for c in self.cats]
             self.apply_filter()
 
     def delete_selected_cat(self): # Удаление выбранного кота
-        row = self.table.currentRow()
-        if row < 0:
+        row = self.table.currentRow() # Получаем выбранную строку
+        if row < 0: # Если пустая
             QMessageBox.warning(self, "Ошибка", "Выберите кота для удаления.")
             return
-
+        # Подтверждение удаления
         reply = QMessageBox.question(self, "Удалить?", "Точно удалить этого кота?", QMessageBox.Yes | QMessageBox.No)
         if reply == QMessageBox.Yes:
-            cat = self.filtered_cats[row]
-            self.cats = [c for c in self.cats if c['id'] != cat['id']]
-            self.apply_filter()
+            cat = self.filtered_cats[row] # Получаем кота из выбранной строки
+            self.cats = [c for c in self.cats if c['id'] != cat['id']] # Обновляем список заисключением удалённого кота
+            self.apply_filter() # Обновляем таблицу и применяем фильр
